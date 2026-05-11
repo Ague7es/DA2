@@ -1,0 +1,9 @@
+.idea/
+cmake-build-*/
+build/
+CMakeCache.txt
+CMakeFiles/
+*.o
+*.out
+*.exe
+.DS_Store
