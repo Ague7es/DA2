@@ -213,6 +213,11 @@ void Menu::runRegisterAllocation() {
     else if (config.algorithm == "spilling") {
         result = allocator.allocateSpilling(graph, webs, config.numberOfRegisters, config.parameter);
     }
+    else if (config.algorithm == "splitting") {
+        result = allocator.allocateWithSplitting(webs, config.numberOfRegisters, config.parameter);
+        // splitting may produce derived webs — update the menu's web list
+        if (!result.finalWebs.empty()) webs = result.finalWebs;
+    }
     else {
         std::cerr << "Algorithm not implemented yet: "
                   << config.algorithm << "\n";
