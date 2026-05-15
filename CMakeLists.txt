@@ -15,4 +15,8 @@ add_executable(DA2 src/main.cpp
         src/RegisterParser.cpp
         include/Web.h
         include/WebBuilder.h
-        src/WebBuilder.cpp)
+        src/WebBuilder.cpp
+        include/Graph.h
+        include/InterferenceGraphBuilder.h
+        src/InterferenceGraphBuilder.cpp
+)
