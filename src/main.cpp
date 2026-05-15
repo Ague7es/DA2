@@ -34,6 +34,9 @@ int main(int argc, char* argv[]) {
             if (config.algorithm == "basic") {
                 result = allocator.allocateBasic(graph, webs, config.numberOfRegisters);
             }
+            else if (config.algorithm == "spilling") {
+                result = allocator.allocateSpilling(graph, webs, config.numberOfRegisters, config.parameter);
+            }
             else {
                 std::cerr << "Algorithm not implemented yet: " << config.algorithm << "\n";
                 return 1;
