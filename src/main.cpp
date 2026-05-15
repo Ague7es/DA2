@@ -4,6 +4,7 @@
 #include "../include/Menu.h"
 #include "../include/RangeParser.h"
 #include "../include/RegisterParser.h"
+#include "../include/WebBuilder.h"
 
 int main(int argc, char* argv[]) {
     try {
@@ -14,9 +15,11 @@ int main(int argc, char* argv[]) {
 
             RangeParser rangeParser;
             RegisterParser registerParser;
+            WebBuilder webBuilder;
 
             auto ranges = rangeParser.parse(rangesFile);
             auto config = registerParser.parse(registersFile);
+            auto webs = webBuilder.build(ranges);
 
             std::cout << "Batch mode\n";
             std::cout << "Ranges file: " << rangesFile << "\n";
@@ -26,7 +29,30 @@ int main(int argc, char* argv[]) {
             std::cout << "Parsed live ranges: " << ranges.size() << "\n";
             std::cout << "Registers: " << config.numberOfRegisters << "\n";
             std::cout << "Algorithm: " << config.algorithm << "\n";
-            std::cout << "Parameter: " << config.parameter << "\n";
+            std::cout << "Parameter: " << config.parameter << "\n\n";
+
+            std::cout << "Generated webs: " << webs.size() << "\n";
+
+            for (const auto& web : webs) {
+                std::cout << "web" << web.id
+                          << " (" << web.variable << "): ";
+
+                for (const auto& point : web.points) {
+                    std::cout << point.line;
+
+                    if (point.isStart) {
+                        std::cout << "+";
+                    }
+
+                    if (point.isEnd) {
+                        std::cout << "-";
+                    }
+
+                    std::cout << " ";
+                }
+
+                std::cout << "\n";
+            }
 
             return 0;
         }
