@@ -12,4 +12,7 @@ add_executable(DA2 src/main.cpp
         include/LiveRange.h
         include/AllocationConfig.h
         src/RangeParser.cpp
-        src/RegisterParser.cpp)
+        src/RegisterParser.cpp
+        include/Web.h
+        include/WebBuilder.h
+        src/WebBuilder.cpp)
