@@ -19,4 +19,7 @@ add_executable(DA2 src/main.cpp
         include/Graph.h
         include/InterferenceGraphBuilder.h
         src/InterferenceGraphBuilder.cpp
+        include/AllocationResult.h
+        include/RegisterAllocator.h
+        src/RegisterAllocator.cpp
 )
