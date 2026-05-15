@@ -6,6 +6,7 @@
 #include "../include/RegisterParser.h"
 #include "../include/WebBuilder.h"
 #include "../include/InterferenceGraphBuilder.h"
+#include "../include/RegisterAllocator.h"
 
 int main(int argc, char* argv[]) {
     try {
@@ -18,12 +19,13 @@ int main(int argc, char* argv[]) {
             RegisterParser registerParser;
             WebBuilder webBuilder;
             InterferenceGraphBuilder graphBuilder;
-
+            RegisterAllocator allocator;
 
             auto ranges = rangeParser.parse(rangesFile);
             auto config = registerParser.parse(registersFile);
             auto webs = webBuilder.build(ranges);
             auto graph = graphBuilder.build(webs);
+            auto result = allocator.allocateBasic(graph, webs, config.numberOfRegisters);
 
             std::cout << "Batch mode\n";
             std::cout << "Ranges file: " << rangesFile << "\n";
@@ -68,6 +70,33 @@ int main(int argc, char* argv[]) {
                 }
 
                 std::cout << "\n";
+            }
+
+            std::cout << "\nRegister allocation result:\n";
+
+            if (!result.success) {
+                std::cout << "Allocation failed with "
+                          << config.numberOfRegisters
+                          << " register(s).\n";
+
+                std::cout << "All webs assigned to memory.\n";
+
+                for (int webId : result.spilledWebs) {
+                    std::cout << "M: web" << webId << "\n";
+                }
+            }
+            else {
+                std::cout << "Registers used: "
+                          << result.registersUsed
+                          << "\n";
+
+                for (const auto& pair : result.webToRegister) {
+                    std::cout << "r"
+                              << pair.second
+                              << ": web"
+                              << pair.first
+                              << "\n";
+                }
             }
 
             return 0;
