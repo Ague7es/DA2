@@ -3,4 +3,6 @@ project(DA2)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(DA2 src/main.cpp)
+add_executable(DA2 src/main.cpp
+        include/menu.h
+        src/menu.cpp)
