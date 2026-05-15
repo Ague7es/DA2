@@ -5,6 +5,7 @@
 #include "../include/RangeParser.h"
 #include "../include/RegisterParser.h"
 #include "../include/WebBuilder.h"
+#include "../include/InterferenceGraphBuilder.h"
 
 int main(int argc, char* argv[]) {
     try {
@@ -16,10 +17,13 @@ int main(int argc, char* argv[]) {
             RangeParser rangeParser;
             RegisterParser registerParser;
             WebBuilder webBuilder;
+            InterferenceGraphBuilder graphBuilder;
+
 
             auto ranges = rangeParser.parse(rangesFile);
             auto config = registerParser.parse(registersFile);
             auto webs = webBuilder.build(ranges);
+            auto graph = graphBuilder.build(webs);
 
             std::cout << "Batch mode\n";
             std::cout << "Ranges file: " << rangesFile << "\n";
@@ -49,6 +53,18 @@ int main(int argc, char* argv[]) {
                     }
 
                     std::cout << " ";
+                }
+
+                std::cout << "\n";
+            }
+
+            std::cout << "\nInterference graph:\n";
+
+            for (auto vertex : graph.getVertexSet()) {
+                std::cout << "web" << vertex->getInfo() << " -> ";
+
+                for (auto edge : vertex->getAdj()) {
+                    std::cout << "web" << edge->getDest()->getInfo() << " ";
                 }
 
                 std::cout << "\n";
