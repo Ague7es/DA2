@@ -7,6 +7,7 @@
 #include "../include/WebBuilder.h"
 #include "../include/InterferenceGraphBuilder.h"
 #include "../include/RegisterAllocator.h"
+#include "../include/OutputWriter.h"
 
 int main(int argc, char* argv[]) {
     try {
@@ -98,6 +99,8 @@ int main(int argc, char* argv[]) {
                               << "\n";
                 }
             }
+
+            OutputWriter::write(outputFile, webs, result);
 
             return 0;
         }

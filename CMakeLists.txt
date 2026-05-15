@@ -22,4 +22,6 @@ add_executable(DA2 src/main.cpp
         include/AllocationResult.h
         include/RegisterAllocator.h
         src/RegisterAllocator.cpp
+        include/OutputWriter.h
+        src/OutputWriter.cpp
 )
