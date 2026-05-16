@@ -15,8 +15,6 @@ struct AllocationResult {
     std::map<int, int> webToRegister;
     std::set<int> spilledWebs;
 
-    // Populated by allocateWithSplitting: the web list after all splits.
-    // Empty for basic/spilling (original web list is unchanged there).
     std::vector<Web> finalWebs;
 };
 

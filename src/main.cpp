@@ -12,7 +12,6 @@
 int main(int argc, char* argv[]) {
     try {
 
-        // Batch mode
         if (argc == 5 && std::string(argv[1]) == "-b") {
 
             std::string rangesFile = argv[2];
