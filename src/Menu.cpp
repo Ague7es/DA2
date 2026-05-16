@@ -24,6 +24,7 @@ void Menu::run() {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cout << "Invalid option.\n";
+            option = -1;
             continue;
         }
 
@@ -66,7 +67,7 @@ void Menu::run() {
 }
 
 void Menu::showMainMenu() const {
-    std::cout << "\n========== DA Project 2 ==========\n";
+    std::cout << "\n========== Register Allocation Tool==========\n";
     std::cout << "1. Load input files\n";
     std::cout << "2. Show live ranges\n";
     std::cout << "3. Build webs\n";
@@ -81,35 +82,39 @@ void Menu::showMainMenu() const {
 }
 
 void Menu::loadInputFiles() {
-    std::string newRangesFile;
-    std::string newRegistersFile;
-    std::string newOutputFile;
+    std::string rangesName;
+    std::string registersName;
+    std::string outputName;
 
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    std::cout << "\nRanges file path (empty to cancel): ";
-    std::getline(std::cin, newRangesFile);
+    std::cout << "\nRanges file name (empty to cancel): ";
+    std::getline(std::cin, rangesName);
 
-    if (newRangesFile.empty()) {
+    if (rangesName.empty()) {
         std::cout << "Load cancelled.\n";
         return;
     }
 
-    std::cout << "Registers file path (empty to cancel): ";
-    std::getline(std::cin, newRegistersFile);
+    std::cout << "Registers file name (empty to cancel): ";
+    std::getline(std::cin, registersName);
 
-    if (newRegistersFile.empty()) {
+    if (registersName.empty()) {
         std::cout << "Load cancelled.\n";
         return;
     }
 
-    std::cout << "Output file path (empty to cancel): ";
-    std::getline(std::cin, newOutputFile);
+    std::cout << "Output file name (empty to cancel): ";
+    std::getline(std::cin, outputName);
 
-    if (newOutputFile.empty()) {
+    if (outputName.empty()) {
         std::cout << "Load cancelled.\n";
         return;
     }
+
+    std::string newRangesFile = "../dataset/ranges/" + rangesName;
+    std::string newRegistersFile = "../dataset/registers/" + registersName;
+    std::string newOutputFile = "../dataset/output/" + outputName;
 
     try {
         RangeParser rangeParser;
@@ -125,22 +130,40 @@ void Menu::loadInputFiles() {
         ranges = newRanges;
         config = newConfig;
 
+        webs.clear();
+        result = AllocationResult();
+
         hasInput = true;
         hasWebs = false;
         hasGraph = false;
         hasAllocation = false;
 
-        webs.clear();
-        result = AllocationResult();
-
         std::cout << "\nInput loaded successfully.\n";
-        std::cout << "Live ranges: " << ranges.size() << "\n";
-        std::cout << "Registers: " << config.numberOfRegisters << "\n";
-        std::cout << "Algorithm: " << config.algorithm << "\n";
+        std::cout << "Live ranges: "
+                  << ranges.size()
+                  << "\n";
+
+        std::cout << "Registers: "
+                  << config.numberOfRegisters
+                  << "\n";
+
+        std::cout << "Algorithm: "
+                  << config.algorithm
+                  << "\n";
     }
     catch (const std::exception& e) {
-        std::cout << "\nError: " << e.what() << "\n";
-        std::cout << "Input was not loaded. Please try again.\n";
+
+        std::cout << "\nError: "
+                  << e.what()
+                  << "\n";
+
+        std::cout << "Input was not loaded. "
+                  << "Returning to menu.\n";
+
+        hasInput = false;
+        hasWebs = false;
+        hasGraph = false;
+        hasAllocation = false;
     }
 }
 
@@ -298,11 +321,16 @@ void Menu::showAllocationResult() const {
 
 void Menu::saveOutput() const {
     if (!hasAllocation) {
-        std::cout << "Error: allocation not executed.\n";
+        std::cout << "\nError: allocation not executed.\n";
         return;
     }
 
-    OutputWriter::write(outputFile, webs, result);
-
-    std::cout << "Output written to: " << outputFile << "\n";
+    try {
+        OutputWriter::write(outputFile, webs, result);
+        std::cout << "\nOutput written to: " << outputFile << "\n";
+    }
+    catch (const std::exception& e) {
+        std::cout << "\nError: " << e.what() << "\n";
+        std::cout << "Output was not saved. Returning to menu.\n";
+    }
 }

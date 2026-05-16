@@ -26,6 +26,14 @@ bool InterferenceGraphBuilder::interfere(const Web& a, const Web& b) const {
     for (const auto& pointA : a.points) {
         for (const auto& pointB : b.points) {
             if (pointA.line == pointB.line) {
+
+                bool aEndsAndBStarts = pointA.isEnd && pointB.isStart;
+                bool bEndsAndAStarts = pointB.isEnd && pointA.isStart;
+
+                if (aEndsAndBStarts || bEndsAndAStarts) {
+                    continue;
+                }
+
                 return true;
             }
         }

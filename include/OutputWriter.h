@@ -15,7 +15,7 @@ public:
     static void write(const std::string& filename, const std::vector<Web>& webs, const AllocationResult& result);
 
 private:
-    static void writeWeb(std::ofstream& file, const Web& web);
+    static void writeWeb(std::ofstream& file, const Web& web, int printedId);
 };
 
 #endif //DA2_OUTPUTWRITER_H
