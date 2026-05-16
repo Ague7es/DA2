@@ -6,6 +6,7 @@
 
 #include <fstream>
 #include <stdexcept>
+#include <algorithm>
 
 void OutputWriter::write(const std::string& filename, const std::vector<Web>& webs, const AllocationResult& result) {
     std::ofstream file(filename);
@@ -14,12 +15,15 @@ void OutputWriter::write(const std::string& filename, const std::vector<Web>& we
         throw std::runtime_error("Could not open output file: " + filename);
     }
 
+    std::vector<Web> sortedWebs = webs;
+
+    std::sort(sortedWebs.begin(), sortedWebs.end(),[](const Web& a, const Web& b) { return a.id < b.id;});
+
     file << "# Total number of webs followed by the listing of the program points of each one\n";
     file << "# program points in each web are sorted in ascending order\n";
+    file << "webs: " << sortedWebs.size() << "\n";
 
-    file << "webs: " << webs.size() << "\n";
-
-    for (const auto& web : webs) {
+    for (const auto& web : sortedWebs) {
         writeWeb(file, web);
     }
 
@@ -27,9 +31,11 @@ void OutputWriter::write(const std::string& filename, const std::vector<Web>& we
     file << "registers: " << result.registersUsed << "\n";
 
     if (!result.success) {
-        for (const auto& web : webs) {
+        for (const auto& web : sortedWebs) {
             file << "M: web" << web.id << "\n";
         }
+        file.flush();
+        file.close();
         return;
     }
 
@@ -38,7 +44,10 @@ void OutputWriter::write(const std::string& filename, const std::vector<Web>& we
         int registerId = pair.second;
 
         file << "r" << registerId << ": web" << webId << "\n";
+
     }
+    file.flush();
+    file.close();
 }
 
 void OutputWriter::writeWeb(std::ofstream& file, const Web& web) {

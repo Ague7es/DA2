@@ -6,6 +6,7 @@
 #include "../include/InterferenceGraphBuilder.h"
 #include "../include/RegisterAllocator.h"
 #include "../include/OutputWriter.h"
+#include "../include/AllocationResult.h"
 
 #include <iostream>
 #include <limits>
@@ -22,7 +23,7 @@ void Menu::run() {
         if (std::cin.fail()) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cerr << "Invalid option.\n";
+            std::cout << "Invalid option.\n";
             continue;
         }
 
@@ -58,7 +59,7 @@ void Menu::run() {
                 std::cout << "Exiting...\n";
                 break;
             default:
-                std::cerr << "Invalid option.\n";
+                std::cout << "Invalid option.\n";
         }
 
     } while (option != 0);
@@ -80,35 +81,72 @@ void Menu::showMainMenu() const {
 }
 
 void Menu::loadInputFiles() {
-    std::cout << "Ranges file path: ";
-    std::cin >> rangesFile;
+    std::string newRangesFile;
+    std::string newRegistersFile;
+    std::string newOutputFile;
 
-    std::cout << "Registers file path: ";
-    std::cin >> registersFile;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    std::cout << "Output file path: ";
-    std::cin >> outputFile;
+    std::cout << "\nRanges file path (empty to cancel): ";
+    std::getline(std::cin, newRangesFile);
 
-    RangeParser rangeParser;
-    RegisterParser registerParser;
+    if (newRangesFile.empty()) {
+        std::cout << "Load cancelled.\n";
+        return;
+    }
 
-    ranges = rangeParser.parse(rangesFile);
-    config = registerParser.parse(registersFile);
+    std::cout << "Registers file path (empty to cancel): ";
+    std::getline(std::cin, newRegistersFile);
 
-    hasInput = true;
-    hasWebs = false;
-    hasGraph = false;
-    hasAllocation = false;
+    if (newRegistersFile.empty()) {
+        std::cout << "Load cancelled.\n";
+        return;
+    }
 
-    std::cout << "Input loaded successfully.\n";
-    std::cout << "Live ranges: " << ranges.size() << "\n";
-    std::cout << "Registers: " << config.numberOfRegisters << "\n";
-    std::cout << "Algorithm: " << config.algorithm << "\n";
+    std::cout << "Output file path (empty to cancel): ";
+    std::getline(std::cin, newOutputFile);
+
+    if (newOutputFile.empty()) {
+        std::cout << "Load cancelled.\n";
+        return;
+    }
+
+    try {
+        RangeParser rangeParser;
+        RegisterParser registerParser;
+
+        auto newRanges = rangeParser.parse(newRangesFile);
+        auto newConfig = registerParser.parse(newRegistersFile);
+
+        rangesFile = newRangesFile;
+        registersFile = newRegistersFile;
+        outputFile = newOutputFile;
+
+        ranges = newRanges;
+        config = newConfig;
+
+        hasInput = true;
+        hasWebs = false;
+        hasGraph = false;
+        hasAllocation = false;
+
+        webs.clear();
+        result = AllocationResult();
+
+        std::cout << "\nInput loaded successfully.\n";
+        std::cout << "Live ranges: " << ranges.size() << "\n";
+        std::cout << "Registers: " << config.numberOfRegisters << "\n";
+        std::cout << "Algorithm: " << config.algorithm << "\n";
+    }
+    catch (const std::exception& e) {
+        std::cout << "\nError: " << e.what() << "\n";
+        std::cout << "Input was not loaded. Please try again.\n";
+    }
 }
 
 void Menu::showLiveRanges() const {
     if (!hasInput) {
-        std::cerr << "Error: input files not loaded.\n";
+        std::cout << "Error: input files not loaded.\n";
         return;
     }
 
@@ -130,7 +168,7 @@ void Menu::showLiveRanges() const {
 
 void Menu::buildWebs() {
     if (!hasInput) {
-        std::cerr << "Error: input files not loaded.\n";
+        std::cout << "Error: input files not loaded.\n";
         return;
     }
 
@@ -147,7 +185,7 @@ void Menu::buildWebs() {
 
 void Menu::showWebs() const {
     if (!hasWebs) {
-        std::cerr << "Error: webs not built.\n";
+        std::cout << "Error: webs not built.\n";
         return;
     }
 
@@ -169,7 +207,7 @@ void Menu::showWebs() const {
 
 void Menu::buildInterferenceGraph() {
     if (!hasWebs) {
-        std::cerr << "Error: webs not built.\n";
+        std::cout << "Error: webs not built.\n";
         return;
     }
 
@@ -184,7 +222,7 @@ void Menu::buildInterferenceGraph() {
 
 void Menu::showInterferenceGraph() const {
     if (!hasGraph) {
-        std::cerr << "Error: interference graph not built.\n";
+        std::cout << "Error: interference graph not built.\n";
         return;
     }
 
@@ -201,7 +239,7 @@ void Menu::showInterferenceGraph() const {
 
 void Menu::runRegisterAllocation() {
     if (!hasGraph) {
-        std::cerr << "Error: interference graph not built.\n";
+        std::cout << "Error: interference graph not built.\n";
         return;
     }
 
@@ -219,23 +257,24 @@ void Menu::runRegisterAllocation() {
         if (!result.finalWebs.empty()) webs = result.finalWebs;
     }
     else {
-        std::cerr << "Algorithm not implemented yet: "
+        std::cout << "Algorithm not implemented yet: "
                   << config.algorithm << "\n";
         return;
     }
 
     hasAllocation = true;
-
-    std::cout << "Register allocation completed.\n";
-
     if (!result.success) {
-        std::cerr << "Warning: assignment to the provided number of registers was not possible.\n";
+        std::cout << "\nRegister allocation failed.\n";
+        std::cout << "Assignment to the provided number " << "of registers was not possible.\n";
+    }
+    else {
+        std::cout << "\nRegister allocation completed successfully.\n";
     }
 }
 
 void Menu::showAllocationResult() const {
     if (!hasAllocation) {
-        std::cerr << "Error: allocation not executed.\n";
+        std::cout << "Error: allocation not executed.\n";
         return;
     }
 
@@ -259,7 +298,7 @@ void Menu::showAllocationResult() const {
 
 void Menu::saveOutput() const {
     if (!hasAllocation) {
-        std::cerr << "Error: allocation not executed.\n";
+        std::cout << "Error: allocation not executed.\n";
         return;
     }
 
