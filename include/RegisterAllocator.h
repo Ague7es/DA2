@@ -98,6 +98,26 @@ public:
      */
     AllocationResult allocateWithSplitting(const std::vector<Web>& webs, int numberOfRegisters, int maxSplits) const;
 
+    /**
+     * @brief Performs register allocation using the DSATUR graph colouring algorithm.
+     *
+     * Unlike the basic algorithm, DSATUR uses a dynamic node ordering:
+     * at each step the most-constrained uncoloured node (highest saturation)
+     * is coloured first. This avoids the simplification/spill phase entirely
+     * and consistently produces near-optimal colourings.
+     *
+     * @param graph Interference graph.
+     * @param webs Program webs.
+     * @param numberOfRegisters Number of available registers.
+     *
+     * @return Allocation result.
+     *
+     * Time Complexity:
+     * O(V²)
+     *
+     * where:
+     * - V = number of webs
+     */
     AllocationResult allocateFree(const Graph<int>& graph, const std::vector<Web>& webs, int numberOfRegisters) const;
 
 private:
@@ -112,6 +132,9 @@ private:
      *
      * Time Complexity:
      * O(E)
+     *
+     * where:
+     * - E = number of edges
      */
     std::set<int> getNeighbors(const Graph<int>& graph, int webId) const;
 
@@ -127,6 +150,9 @@ private:
      *
      * Time Complexity:
      * O(V²)
+     *
+     * where:
+     * - V = number of webs
      */
     int chooseSpillCandidate(const std::set<int>& activeNodes, const Graph<int>& graph) const;
 
@@ -142,6 +168,9 @@ private:
      *
      * Time Complexity:
      * O(V² log V)
+     *
+     * where:
+     * - V = number of webs
      */
     std::vector<int> rankSpillCandidates(const Graph<int>& graph, const std::vector<Web>& webs) const;
 
@@ -157,6 +186,10 @@ private:
      *
      * Time Complexity:
      * O(V² + VE)
+     *
+     * where:
+     * - V = number of webs
+     * - E = number of edges
      */
     AllocationResult tryColorWithSpills(const Graph<int>& graph, const std::vector<Web>& webs, int numberOfRegisters, const std::set<int>& spilledIds) const;
 
@@ -171,6 +204,9 @@ private:
      *
      * Time Complexity:
      * O(P)
+     *
+     * where:
+     * - P = average number of program points
      */
     std::pair<Web, Web> splitWeb(const Web& web, int splitIndex, int nextId) const;
 
@@ -188,6 +224,10 @@ private:
      *
      * Time Complexity:
      * O(W * P²)
+     *
+     * where:
+     * - W = number of webs
+     * - P = average number of program points
      */
     std::pair<int, int> bestSplitPoint(const Web& web, const std::vector<Web>& allWebs) const;
 
@@ -206,9 +246,32 @@ private:
      *
      * Time Complexity:
      * O(W² * P²)
+     *
+     * where:
+     * - W = number of webs
+     * - P = average number of program points
      */
     std::pair<int, int> chooseSplitCandidate(const std::vector<Web>& currentWebs) const;
 
+    /**
+     * @brief Selects the next uncoloured node to colour using the DSATUR heuristic.
+     *
+     * Picks the node with the highest saturation (number of distinct colours
+     * among already-coloured neighbours). Ties are broken by highest degree
+     * in the original interference graph.
+     *
+     * @param uncoloured Set of not yet coloured web identifiers.
+     * @param saturations Map from web identifier to current saturation value.
+     * @param degrees Map from web identifier to degree in the interference graph.
+     *
+     * @return Identifier of the selected web.
+     *
+     * Time Complexity:
+     * O(V)
+     *
+     * where:
+     * - V = number of uncoloured webs
+     */
     int dsaturPickNext(const std::set<int>& uncoloured,
                        const std::map<int, int>& saturations,
                        const std::map<int, int>& degrees) const;
