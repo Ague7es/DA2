@@ -45,10 +45,10 @@ public:
      * @return Allocation result.
      *
      * Time Complexity:
-     * O(V² + VE)
+     * O(W² + WE)
      *
      * where:
-     * - V = number of webs
+     * - W = number of webs
      * - E = number of interference edges
      */
     AllocationResult allocateBasic(const Graph<int>& graph, const std::vector<Web>& webs, int numberOfRegisters) const;
@@ -67,11 +67,11 @@ public:
      * @return Allocation result.
      *
      * Time Complexity:
-     * Approximately O(S * (V² + VE))
+     * Approximately O(S * (W² + VE))
      *
      * where:
      * - S = number of spill attempts
-     * - V = number of webs
+     * - W = number of webs
      * - E = number of edges
      */
     AllocationResult allocateSpilling(const Graph<int>& graph, const std::vector<Web>& webs, int numberOfRegisters, int maxSpills) const;
@@ -113,10 +113,10 @@ public:
      * @return Allocation result.
      *
      * Time Complexity:
-     * O(V²)
+     * O(W²)
      *
      * where:
-     * - V = number of webs
+     * - W = number of webs
      */
     AllocationResult allocateFree(const Graph<int>& graph, const std::vector<Web>& webs, int numberOfRegisters) const;
 
@@ -149,10 +149,10 @@ private:
      * @return Selected spill candidate identifier.
      *
      * Time Complexity:
-     * O(V²)
+     * O(W²)
      *
      * where:
-     * - V = number of webs
+     * - W = number of webs
      */
     int chooseSpillCandidate(const std::set<int>& activeNodes, const Graph<int>& graph) const;
 
@@ -167,10 +167,10 @@ private:
      * @return Ordered vector of spill candidate identifiers.
      *
      * Time Complexity:
-     * O(V² log V)
+     * O(W² log W)
      *
      * where:
-     * - V = number of webs
+     * - W = number of webs
      */
     std::vector<int> rankSpillCandidates(const Graph<int>& graph, const std::vector<Web>& webs) const;
 
@@ -185,10 +185,10 @@ private:
      * @return Allocation result.
      *
      * Time Complexity:
-     * O(V² + VE)
+     * O(W² + WE)
      *
      * where:
-     * - V = number of webs
+     * - W = number of webs
      * - E = number of edges
      */
     AllocationResult tryColorWithSpills(const Graph<int>& graph, const std::vector<Web>& webs, int numberOfRegisters, const std::set<int>& spilledIds) const;
