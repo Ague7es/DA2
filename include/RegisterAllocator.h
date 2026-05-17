@@ -253,7 +253,6 @@ private:
      */
     std::pair<int, int> chooseSplitCandidate(const std::vector<Web>& currentWebs) const;
 
-
     /**
      * @brief Selects the next uncoloured node to colour using the DSATUR heuristic.
      *
