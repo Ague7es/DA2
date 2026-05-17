@@ -40,6 +40,9 @@ int main(int argc, char* argv[]) {
                 result = allocator.allocateWithSplitting(webs, config.numberOfRegisters, config.parameter);
                 if (!result.finalWebs.empty()) webs = result.finalWebs;
             }
+            else if (config.algorithm == "free") {
+                result = allocator.allocateFree(graph, webs, config.numberOfRegisters);
+            }
             else {
                 std::cerr << "Algorithm not implemented yet: " << config.algorithm << "\n";
                 return 1;
