@@ -9,6 +9,16 @@
 #include <vector>
 #include "ProgramPoint.h"
 
+/**
+ * @struct Web
+ *
+ * @brief Represents a web used for register allocation.
+ *
+ * A web is a group of connected live ranges belonging to the same variable.
+ *
+ * Webs are used as the vertices of the interference graph during
+ * register allocation.
+ */
 struct Web {
     int id;
     std::string variable;

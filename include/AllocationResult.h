@@ -8,6 +8,18 @@
 #include <map>
 #include <set>
 
+/**
+ * @struct AllocationResult
+ *
+ * @brief Stores the result of a register allocation execution.
+ *
+ * This structure contains:
+ * - whether the allocation was successful;
+ * - the number of registers effectively used;
+ * - the mapping between webs and assigned registers;
+ * - the set of spilled webs;
+ * - the final set of webs after optional splitting operations.
+ */
 struct AllocationResult {
     bool success = false;
     int registersUsed = 0;

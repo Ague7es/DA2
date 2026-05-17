@@ -16,8 +16,42 @@ class Edge;
 
 #define INF std::numeric_limits<double>::max()
 
+/**
+ * @class Graph
+ *
+ * @brief Generic graph data structure from practical classes used as the base representation for the interference graph.
+ *
+ * This structure was adapted from the graph implementation provided in the DA practical classes.
+ * In this project, it is mainly used to represent the interference graph, where:
+ * - each vertex represents a web;
+ * - each bidirectional edge represents an interference between two webs.
+ *
+ * The most relevant methods used in this project are:
+ * - addVertex()
+ * - addBidirectionalEdge()
+ * - findVertex()
+ * - getVertexSet()
+ * - getAdj()
+ *
+ * Time Complexity of relevant operations:
+ * - addVertex(): O(V)
+ * - findVertex(): O(V)
+ * - addBidirectionalEdge(): O(V)
+ * - getVertexSet(): O(V)
+ *
+ * where:
+ * - V = number of vertices.
+ */
+
 /************************* Vertex  **************************/
 
+/**
+ * @class Vertex
+ *
+ * @brief Generic graph vertex.
+ *
+ * In this project, each vertex stores an integer corresponding to a web id.
+ */
 template <class T>
 class Vertex {
 public:
@@ -71,6 +105,13 @@ protected:
 
 /********************** Edge  ****************************/
 
+/**
+ * @class Edge
+ *
+ * @brief Generic graph edge.
+ *
+ * In this project, edges represent interferences between webs.
+ */
 template <class T>
 class Edge {
 public:
