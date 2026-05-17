@@ -279,6 +279,9 @@ void Menu::runRegisterAllocation() {
         // splitting may produce derived webs — update the menu's web list
         if (!result.finalWebs.empty()) webs = result.finalWebs;
     }
+    else if (config.algorithm == "free") {
+        result = allocator.allocateFree(graph, webs, config.numberOfRegisters);
+    }
     else {
         std::cout << "Algorithm not implemented yet: "
                   << config.algorithm << "\n";

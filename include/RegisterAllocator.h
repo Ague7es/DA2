@@ -98,6 +98,8 @@ public:
      */
     AllocationResult allocateWithSplitting(const std::vector<Web>& webs, int numberOfRegisters, int maxSplits) const;
 
+    AllocationResult allocateFree(const Graph<int>& graph, const std::vector<Web>& webs, int numberOfRegisters) const;
+
 private:
 
     /**
@@ -206,6 +208,10 @@ private:
      * O(W² * P²)
      */
     std::pair<int, int> chooseSplitCandidate(const std::vector<Web>& currentWebs) const;
+
+    int dsaturPickNext(const std::set<int>& uncoloured,
+                       const std::map<int, int>& saturations,
+                       const std::map<int, int>& degrees) const;
 };
 
 #endif //DA2_REGISTERALLOCATOR_H

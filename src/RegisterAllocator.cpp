@@ -430,3 +430,98 @@ AllocationResult RegisterAllocator::allocateWithSplitting(const std::vector<Web>
     for (const auto& w : currentWebs) failed.spilledWebs.insert(w.id);
     return failed;
 }
+
+int RegisterAllocator::dsaturPickNext(
+        const std::set<int>& uncoloured,
+        const std::map<int, int>& saturations,
+        const std::map<int, int>& degrees) const {
+
+    int bestNode = -1;
+    int bestSat  = -1;
+    int bestDeg  = -1;
+
+    for (int node : uncoloured) {
+        int sat = saturations.at(node);
+        int deg = degrees.at(node);
+
+        bool better = (sat > bestSat) ||
+                      (sat == bestSat && deg > bestDeg);
+
+        if (better) {
+            bestNode = node;
+            bestSat  = sat;
+            bestDeg  = deg;
+        }
+    }
+
+    return bestNode;
+}
+
+AllocationResult RegisterAllocator::allocateFree(
+        const Graph<int>& graph,
+        const std::vector<Web>& webs,
+        int numberOfRegisters) const {
+
+    AllocationResult result;
+
+    std::map<int, int> degrees;
+    std::map<int, int> saturations;
+    std::set<int> uncoloured;
+    std::map<int, int> colours;
+
+    for (const auto& web : webs) {
+        int id  = web.id;
+        int deg = static_cast<int>(getNeighbors(graph, id).size());
+        degrees[id]     = deg;
+        saturations[id] = 0;
+        uncoloured.insert(id);
+    }
+
+    while (!uncoloured.empty()) {
+
+        int node = dsaturPickNext(uncoloured, saturations, degrees);
+
+        std::set<int> neighbourColours;
+        for (int nb : getNeighbors(graph, node)) {
+            if (colours.count(nb)) {
+                neighbourColours.insert(colours.at(nb));
+            }
+        }
+
+        int chosen = 0;
+        while (neighbourColours.count(chosen)) chosen++;
+        colours[node] = chosen;
+        uncoloured.erase(node);
+
+        for (int nb : getNeighbors(graph, node)) {
+            if (!uncoloured.count(nb)) continue; // already coloured, skip
+
+            // Check whether 'chosen' was already seen by nb from another neighbour
+            bool alreadySeen = false;
+            for (int nb2 : getNeighbors(graph, nb)) {
+                if (nb2 == node) continue;
+                if (colours.count(nb2) && colours.at(nb2) == chosen) {
+                    alreadySeen = true;
+                    break;
+                }
+            }
+            if (!alreadySeen) saturations[nb]++;
+        }
+    }
+
+    int maxColour = -1;
+    for (const auto& [id, col] : colours) maxColour = std::max(maxColour, col);
+    int coloursUsed = maxColour + 1;
+
+    if (coloursUsed <= numberOfRegisters) {
+        result.success       = true;
+        result.registersUsed = coloursUsed;
+        result.webToRegister = colours;
+    } else {
+        result.success       = false;
+        result.registersUsed = 0;
+        for (const auto& web : webs) result.spilledWebs.insert(web.id);
+    }
+
+    return result;
+}
